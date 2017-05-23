@@ -1,6 +1,87 @@
 {
   "builders": [
     {
+      "type": "vmware-iso",
+      "boot_wait": "5s",
+      "boot_command": [
+        "<enter><wait10><wait10>",
+        "vyos<enter><wait>",
+        "vyos<enter><wait>",
+        "install system<enter><wait>",
+        "<enter><wait>",
+        "<enter><wait>",
+        "<enter><wait>",
+        "Yes<enter><wait>",
+        "<enter><wait10><wait10><wait10><wait10>",
+        "<enter><wait>",
+        "vagrant<enter><wait>",
+        "vagrant<enter><wait>",
+        "<enter><wait5>",
+        "reboot<enter><wait>",
+        "Yes<enter><wait10><wait10><wait10><wait10>",
+        "vyos<enter><wait>",
+        "vagrant<enter><wait>",
+        "configure<enter><wait>",
+        "set interfaces ethernet eth0 address dhcp<enter><wait>",
+        "set system login user vagrant authentication plaintext-password vagrant<enter><wait>",
+        "set system login user vagrant level admin<enter><wait>",
+        "set service ssh<enter><wait>",
+        "commit<enter><wait>",
+        "save<enter><wait>",
+        "exit<enter><wait>",
+        "exit<enter><wait5>",
+        "vagrant<enter><wait>",
+        "vagrant<enter><wait>",
+        "configure<enter><wait>",
+        "delete system login user vyos<enter><wait>",
+        "commit<enter><wait>",
+        "save<enter><wait>",
+        "exit<enter><wait>"
+      ],
+      "disk_size": 2048,
+      "guest_os_type": "ubuntu-64",
+      "headless": false,
+      "iso_url": "iso/vyos-1.1.7-amd64.iso",
+      "iso_checksum": "1e81aa85bb070e9fbf9b02ad7e649ef51d9690a4126ca92b2c1a8d2ef1fbf8b0",
+      "iso_checksum_type": "sha256",
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "shutdown_command": "sudo poweroff",
+      "output_directory": "boxes",
+      "vm_name": "packer-vyos-amd64",
+      "vmx_data": {
+        "memsize" : "512",
+        "cpuid.coresPerSocket" : "1",
+        "numvcpus" : "1",
+        "scsi0.virtualDev" : "lsisas1068",
+        "RemoteDisplay.vnc.enabled": "false",
+        "RemoteDisplay.vnc.port": "5900",
+        "ethernet0.virtualdev": "vmxnet3"
+      },
+      "vmx_data_post":{
+        "ide0:0.startConnected": "FALSE",
+        "ide0:1.startConnected": "FALSE",
+        "ide1:0.startConnected": "FALSE",
+        "ide1:1.startConnected": "FALSE",
+        "ide0:0.deviceType": "cdrom-raw",
+        "ide0:1.deviceType": "cdrom-raw",
+        "ide1:0.deviceType": "cdrom-raw",
+        "ide1:1.deviceType": "cdrom-raw",
+        "ide0:0.clientDevice": "TRUE",
+        "ide0:1.clientDevice": "TRUE",
+        "ide1:0.clientDevice": "TRUE",
+        "ide1:1.clientDevice": "TRUE",
+        "ide0:0.present": "FALSE",
+        "ide0:1.present": "FALSE",
+        "ide1:0.present": "FALSE",
+        "ide1:1.present": "FALSE",
+        "ide0:0.fileName": "emptyBackingString",
+        "ide0:1.fileName": "emptyBackingString",
+        "ide1:0.fileName": "emptyBackingString",
+        "ide1:1.fileName": "emptyBackingString"
+      }
+    },
+    {
       "type": "virtualbox-iso",
       "boot_wait": "5s",
       "boot_command": [
@@ -64,7 +145,22 @@
       "type": "shell",
       "execute_command": "echo 'vagrant' | {{ .Vars }} sudo -E -S bash -c '{{ .Path }}'",
       "scripts": [
-        "scripts/vbox_guest_additions.sh",
+        "scripts/vbox_guest_additions.sh"
+      ],
+      "only": ["virtualbox-iso"]
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo 'vagrant' | {{ .Vars }} sudo -E -S bash -c '{{ .Path }}'",
+      "scripts": [
+        "scripts/vmware-iso.sh"
+      ],
+      "only": ["vmware-iso"]
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo 'vagrant' | {{ .Vars }} sudo -E -S bash -c '{{ .Path }}'",
+      "scripts": [
         "scripts/cleanup.sh"
       ]
     }
